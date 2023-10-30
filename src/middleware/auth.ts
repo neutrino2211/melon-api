@@ -10,11 +10,13 @@ export const authMiddleware = async (req: RequestWithUser, res: Response, next: 
     const userToken = req.headers['x-melon-token'] as string;
     const userEmail = req.headers['x-melon-email'] as string;
 
+    console.log(userEmail, userToken)
+
     if (!userToken || !userEmail) return errorHandler(res, "Unauthorised", 401);
 
     const data = decoupleAccessToken(userToken, md5(userEmail))
 
-    console.log(data)
+    console.log("D:", data)
 
     if (Date.now() > Number(data.expiresIn)) return errorHandler(res, "Token expired", 403)
 

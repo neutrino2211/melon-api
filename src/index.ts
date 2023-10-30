@@ -13,6 +13,8 @@ app.use(bodyParser.json())
 
 auth(app)
 
+app.get("/", (_, res) => res.status(200).send("Server running"))
+
 app.listen(PORT, () => {
     console.log("Listening...", PORT)
 })

@@ -55,7 +55,7 @@ export async function confirmSignup(req: Request, res: Response) {
 
     return successHandler(res, "Signed up successfully", {
         user: newUser.data!![0],
-        token: generateAccessToken(md5(newUser.data!![0].id.toString()), 1000 * 60 * 30, email)
+        token: generateAccessToken(newUser.data!![0].id.toString(), 1000 * 60 * 30, md5(email))
     });
 }
 
