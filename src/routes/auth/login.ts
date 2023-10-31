@@ -9,9 +9,11 @@ const users = client.schema("public").from("users");
 export async function login(req: Request, res: Response) {
     const { email, password } = req.body;
 
+    console.log({email, password})
+
     const userRes = await users.select("*").eq("email", email);
 
-    if (userRes.count == 0) return errorHandler(res, "Invalid email or password", 401);
+    if (userRes.count == 0 || userRes.count == null) return errorHandler(res, "Invalid email or password", 401);
 
     console.log("L:", userRes)
 
