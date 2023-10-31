@@ -13,6 +13,8 @@ export async function login(req: Request, res: Response) {
 
     if (userRes.count == 0) return errorHandler(res, "Invalid email or password", 401);
 
+    console.log("L:", userRes)
+
     const user = userRes.data!![0]
 
     if (user.password !== md5(password)) return errorHandler(res, "Invalid email or password", 401);
