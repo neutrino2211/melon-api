@@ -15,7 +15,7 @@ export async function login(req: Request, res: Response) {
 
     console.log("L:", userRes)
 
-    if (userRes.count == 0 || userRes.count == null) return errorHandler(res, "Invalid email or password", 401);
+    if (userRes.count == 0 || userRes.data?.length == 0) return errorHandler(res, "Invalid email or password", 401);
 
     const user = userRes.data!![0]
 
