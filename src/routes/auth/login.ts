@@ -13,9 +13,9 @@ export async function login(req: Request, res: Response) {
 
     const userRes = await users.select("*").eq("email", email);
 
-    if (userRes.count == 0 || userRes.count == null) return errorHandler(res, "Invalid email or password", 401);
-
     console.log("L:", userRes)
+
+    if (userRes.count == 0 || userRes.count == null) return errorHandler(res, "Invalid email or password", 401);
 
     const user = userRes.data!![0]
 
