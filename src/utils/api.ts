@@ -1,8 +1,7 @@
-import { PostgrestSingleResponse } from "@supabase/supabase-js";
 import { Response, Request } from "express";
-import { Database } from "./database.types";
+import { User } from "../models/User";
 
-export type RequestWithUser = Request & {user: Database['public']['Tables']['users']['Row']}
+export type RequestWithUser = Request & {user: User}
 
 export function successHandler(res: Response, message: string, data: any) {
     res.json({
@@ -18,3 +17,5 @@ export function errorHandler(res: Response, message: string, code: number = 500)
         message,
     }).status(code)
 }
+
+export const genToken = () => Math.random().toString().split('.')[1].slice(0, 6);

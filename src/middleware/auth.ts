@@ -2,9 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { RequestWithUser, errorHandler } from "../utils/api";
 import { decoupleAccessToken } from "../utils/crypto";
 import md5 from "md5";
-import { client } from "../utils/supabase";
-
-const users = client.schema("public").from("users");
+import { userRepository } from "../utils/data-source";
 
 export const authMiddleware = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     const userToken = req.headers['x-melon-token'] as string;
@@ -20,11 +18,11 @@ export const authMiddleware = async (req: RequestWithUser, res: Response, next: 
 
     if (Date.now() > Number(data.expiresIn)) return errorHandler(res, "Token expired", 403)
 
-    const user = await users.select("*").eq("id", Number(data.userId))
+    const user = await userRepository.findOne({where: {id: Number(data.userId)}})
 
-    if (user.data == null) return errorHandler(res, "Unauthorised", 401);
+    if (user == null) return errorHandler(res, "Unauthorised", 401);
 
-    req.user = user.data[0];
+    req.user = user;
 
     next();
 }
