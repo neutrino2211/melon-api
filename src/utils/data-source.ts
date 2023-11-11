@@ -7,7 +7,7 @@ export const MelonDataSource = new DataSource({
   host: "170.187.194.231",
   port: 5432,
   username: "admin",
-  password: "postgres2211",
+  password: process.env.POSTGRES_PASSWORD,
   database: "Melon",
   synchronize: true,
   logging: true,

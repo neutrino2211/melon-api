@@ -4,6 +4,13 @@ import md5 from "md5";
 import { generateAccessToken } from "../../utils/crypto";
 import { userRepository } from "../../utils/data-source";
 import { User } from "../../models/User";
+import sendEmail from "../../utils/sendEmail";
+
+const GET_OTP_MESSAGE = (otp: string, email: string) => `
+<h3>Your OTP</h3>
+
+<p>Welcome ${email}, your OTP is ${otp}</p>
+`;
 
 export async function signUp(req: Request, res: Response) {
     const r = await userRepository.findOne({where: {email: req.body.email}})
@@ -20,6 +27,8 @@ export async function signUp(req: Request, res: Response) {
     user.authorisationCode = token
 
     await userRepository.insert(user);
+
+    sendEmail(user.email, "Welcome to Melon, here's your OTP", GET_OTP_MESSAGE(token, user.email));
 
     console.log(token)
 
