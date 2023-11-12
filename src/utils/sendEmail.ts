@@ -10,6 +10,11 @@ const transporter = nodemailer.createTransport({
 });
 
 export default function sendMail(to: string, subject: string, body: string) {
+  console.log({
+    user: process.env.EMAIL_SENDER,  // Your Gmail email address
+    pass: process.env.EMAIL_APP_PASSWORD, // The app password you generated
+  })
+
   // Create an email message
   const mailOptions: nodemailer.SendMailOptions = {
     from: 'talktomelon@gmail.com',
