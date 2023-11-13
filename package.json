@@ -32,6 +32,7 @@
   "devDependencies": {
     "@types/nodemailer": "^6.4.14",
     "bun": "^1.0.0",
+    "firebase-tools": "^12.8.1",
     "nodemon": "^3.0.1",
     "supabase": "^1.106.1",
     "ts-node": "^10.9.1"
