@@ -80,7 +80,7 @@ export class Crypt {
             const charCode = rounder.crypt(char.codePointAt(0)!!);
             rounder.next();
 
-            r += String.fromCodePoint(charCode);   
+            r += String.fromCodePoint(charCode % 0xfe);   
         }
         return r;
     }
