@@ -15,7 +15,7 @@ const GET_OTP_MESSAGE = (otp: string, email: string) => `
 export async function signUp(req: Request, res: Response) {
     const r = await userRepository.findOne({where: {email: req.body.email}})
     
-    if (!!r) {
+    if (!!r && r.pin != "") {
         return errorHandler(res, "user with email already exists", 403)
     }
 
@@ -26,7 +26,11 @@ export async function signUp(req: Request, res: Response) {
     user.password = md5(req.body.password),
     user.authorisationCode = token
 
-    await userRepository.insert(user);
+    if (r == null) {
+        await userRepository.insert(user);
+    } else {
+        await userRepository.update({email: req.body.email}, user);
+    }
 
     sendEmail(user.email, "Welcome to Melon, here's your OTP", GET_OTP_MESSAGE(token, user.email));
 
