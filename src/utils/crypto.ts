@@ -77,10 +77,14 @@ export class Crypt {
         let r = "";
         for (let i = 0; i < str.length; i++) {
             let char = str[i];
-            const charCode = rounder.crypt(char.codePointAt(0)!!);
+            const charCode = (rounder.crypt(char.codePointAt(0)!!) % 0xef) + 10;
             rounder.next();
 
-            r += String.fromCodePoint(charCode % 0xfe);   
+            try {
+                r += String.fromCodePoint(charCode % 0xfe);   
+            } catch (e) {
+                console.error(e, charCode, r)
+            }
         }
         return r;
     }
