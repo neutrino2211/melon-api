@@ -34,8 +34,6 @@ function xoshiro128ss(a: number, b: number, c: number, d: number) {
     }
 }
 
-
-
 const rounder = {
     _k1: 0,
     _k2: 0,
@@ -58,11 +56,11 @@ const rounder = {
     },
 
     get_factor(): number {
-        return this._inbetween % 0xFF;
+        return Math.abs(this._inbetween) % 0xFF;
     },
 
     crypt(n: number): number {
-        return this.get_factor() ^ (n % 0xFF);
+        return Math.abs(this.get_factor() ^ (n % 0xFF));
     }
 };
 
@@ -77,14 +75,10 @@ export class Crypt {
         let r = "";
         for (let i = 0; i < str.length; i++) {
             let char = str[i];
-            const charCode = (rounder.crypt(char.codePointAt(0)!!) % 0xef) + 10;
+            const charCode = rounder.crypt(char.codePointAt(0)!!)
             rounder.next();
 
-            try {
-                r += String.fromCodePoint(charCode % 0xfe);   
-            } catch (e) {
-                console.error(e, charCode, r)
-            }
+            r += String.fromCodePoint(charCode % 0xfe);  
         }
         return r;
     }
