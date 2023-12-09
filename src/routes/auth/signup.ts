@@ -58,15 +58,17 @@ export async function confirmSignup(req: Request, res: Response) {
 }
 
 export async function setPersonalDetails(req: RequestWithUser, res: Response) {
-    const { name, dateOfBirth } = req.body;
+    const { name, dateOfBirth, bvn, phone } = req.body;
 
     await userRepository.update({email: req.user.email}, {
-        name,
-        dateOfBirth
+        name: name || req.user.name,
+        dateOfBirth: dateOfBirth || req.user.dateOfBirth,
+        bvn: bvn || req.user.bvn,
+        phone: phone || req.user.phone
     })
 
     return successHandler(res, "user updated successfully", {
-        user: {...req.user, name, date_of_birth: dateOfBirth}
+        user: {...req.user, name, dateOfBirth, bvn, phone}
     });
 }
 

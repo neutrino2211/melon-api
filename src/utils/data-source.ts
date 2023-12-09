@@ -4,11 +4,11 @@ import { Wallet } from "../models/Wallet";
 
 export const MelonDataSource = new DataSource({
   type: "postgres",
-  host: "170.187.194.231",
+  host: process.env.POSTGRES_ADDRESS,
   port: 5432,
-  username: "admin",
+  username: process.env.POSTGRES_USERNAME,
   password: process.env.POSTGRES_PASSWORD,
-  database: "Melon",
+  database: process.env.POSTGRES_DATABASE,
   synchronize: true,
   logging: true,
   entities: [User, Wallet],

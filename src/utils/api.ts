@@ -12,10 +12,10 @@ export function successHandler(res: Response, message: string, data: any) {
 }
 
 export function errorHandler(res: Response, message: string, code: number = 500) {
-    res.json({
+    res.status(code).json({
         success: false,
         message,
-    }).status(code)
+    })
 }
 
 export const genToken = () => Math.random().toString().split('.')[1].slice(0, 6);

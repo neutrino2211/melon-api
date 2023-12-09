@@ -27,7 +27,8 @@
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "supabase-cli": "^0.0.21",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "typeorm-extension": "^3.2.0"
   },
   "devDependencies": {
     "@types/nodemailer": "^6.4.14",

@@ -25,4 +25,10 @@ export class User {
 
   @Column({nullable: true})
   verificationPending: boolean = true;
+
+  @Column({nullable: true})
+  phone: string = "";
+
+  @Column({nullable: true})
+  bvn: string = "";
 }

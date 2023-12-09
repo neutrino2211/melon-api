@@ -7,6 +7,7 @@ env.config();
 
 import auth from "./routes/auth";
 import wallet from "./routes/wallet";
+import webhooks from "./routes/webhooks";
 import { MelonDataSource } from "./utils/data-source";
 
 const app = express();
@@ -17,7 +18,10 @@ app.use(bodyParser.json())
 MelonDataSource.initialize().then(() => {
     auth(app);
     wallet(app);
+    webhooks(app)
+
     app.get("/", (_, res) => res.status(200).send("Server running"))
+    
     app.listen(PORT, () => {
         console.log("Listening...", PORT)
     })
