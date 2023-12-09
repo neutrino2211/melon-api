@@ -98,7 +98,7 @@ async function makeBlocGetRequest(path: string) {
 
 export async function createCustomer(user: User): Promise<Result<BlocResponse<AccountCreated>, Error>> {
   console.log(user)
-  const names = user.name.split(' ')
+  const names = user.name.split(' ').filter(n => n.trim() != "")
   const res = await makeBlocPostRequest("/customers", {
     email: user.email,
     phone_number: user.phone,
