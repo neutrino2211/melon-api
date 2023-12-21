@@ -1,11 +1,13 @@
+import env from "dotenv";
+env.config()
+
+
 import "reflect-metadata";
 import express from "express";
 import bodyParser from "body-parser";
 
-import env from "dotenv";
-env.config();
-
 import auth from "./routes/auth";
+import user from "./routes/user";
 import wallet from "./routes/wallet";
 import webhooks from "./routes/webhooks";
 import { MelonDataSource } from "./utils/data-source";
@@ -17,6 +19,7 @@ app.use(bodyParser.json())
 
 MelonDataSource.initialize().then(() => {
     auth(app);
+    user(app);
     wallet(app);
     webhooks(app)
 

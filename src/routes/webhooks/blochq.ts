@@ -7,8 +7,15 @@ export async function blochqWebhook(req: Request, res: Response) {
   console.log(process.env.BLOCHQ_WEBHOOK_KEY, hash, req.headers, req.headers['x-bloc-webhook'])
   if (hash == req.headers['x-bloc-webhook']) {
     // Retrieve the request's body
-    const event = req.body;
+    const {event, data} = req.body;
     // Do something with event
+    switch (event) {
+      case "transaction.new":
+        break;
+    
+      default:
+        break;
+    }
     console.log(event)  
   }
   res.sendStatus(200);

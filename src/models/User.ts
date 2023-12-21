@@ -31,4 +31,7 @@ export class User {
 
   @Column({nullable: true})
   bvn: string = "";
+
+  @Column({nullable: true, type: "text"})
+  photo: string = ""
 }

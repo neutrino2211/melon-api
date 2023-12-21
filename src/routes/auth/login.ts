@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { errorHandler, successHandler } from "../../utils/api";
+import { RequestWithUser, errorHandler, successHandler } from "../../utils/api";
 import md5 from "md5";
 import { generateAccessToken } from "../../utils/crypto";
 import { userRepository } from "../../utils/data-source";

@@ -18,4 +18,9 @@ export function errorHandler(res: Response, message: string, code: number = 500)
     })
 }
 
+export function assertError(res: Response, condition: boolean) {
+    if (condition) errorHandler(res, "Invalid data", 422);
+    return condition;
+}
+
 export const genToken = () => Math.random().toString().split('.')[1].slice(0, 6);

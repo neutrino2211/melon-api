@@ -19,8 +19,13 @@ export async function getBalance(req: RequestWithUser, res: Response) {
 
   try {
     if (wallet.accountId != "") {
-      const blocWallet = await (await blochq.getCustomerWallet(wallet.accountId)).unwrap()
+      const blocWallet = await (await blochq.getCustomerAccount(wallet.accountId)).unwrap()
       wallet.balance = (blocWallet.data.balance / 100)
+      wallet.accountName = blocWallet.data.name;
+      wallet.accountNumber = blocWallet.data.account_number;
+      wallet.bankName = blocWallet.data.bank_name;
+
+      await walletRepository.update({id: wallet.id, accountId: wallet.accountId}, wallet);
     }
   } catch (e: any) {
     console.log(e)

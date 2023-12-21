@@ -2,6 +2,10 @@
 
 import md5 from "md5";
 
+function randRange(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function num2str(n: number): string {
     return md5(n.toString())
 }
@@ -160,4 +164,17 @@ export function decoupleDataToken(token: string, userSecret: string) {
         ...tokenData,
         meta: tokenMetaData
     }
+}
+
+
+
+export function randomString(length: number) {
+    const start = 0x41;
+    const end = 0x5A;
+
+    let r = "";
+
+    for (let i = 0; i < length; i++) r += String.fromCharCode(randRange(start, end));
+
+    return r;
 }
