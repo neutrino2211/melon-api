@@ -23,6 +23,6 @@ export async function upgradeKycToTierOne(req: RequestWithUser, res: Response) {
   
   } catch(e: any) {
     console.error(e)
-    errorHandler(res, e)
+    errorHandler(res, e.message || "Unable to perform action, please try again")
   }
 }

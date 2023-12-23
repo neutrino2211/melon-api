@@ -11,7 +11,7 @@ console.log(PRIVATE_KEY)
 export const ACCOUNT_DETAILS = async () => {
   return {
     bank: "Sterling",
-    accountNumber: "8731278924",
+    accountNumber: "8737496600",
     bankCode: (await (await getBanks()).unwrap()).data.filter(b => b.bank_name.toLowerCase() === "sterling bank plc")[0].bank_code
   }
 }

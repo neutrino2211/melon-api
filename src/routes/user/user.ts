@@ -18,6 +18,6 @@ export async function setUserPhoto(req: RequestWithUser, res: Response) {
     return successHandler(res, "User photo updated", req.user);
   } catch (e: any) {
     console.error(e)
-    return errorHandler(res, e)
+    return errorHandler(res, e.message || "Unable to perform action, please try again")
   }
 }

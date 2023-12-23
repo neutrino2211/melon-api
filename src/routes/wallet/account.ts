@@ -56,7 +56,7 @@ export async function createWallet(req: RequestWithUser, res: Response) {
     return successHandler(res, "Wallet created successfully", {wallet: customerFixedAccount.data})
   } catch (e: any) {
     console.error(e)
-    return errorHandler(res, e)
+    return errorHandler(res, e.message || "Unable to perform action, please try again")
   }
 }
 
@@ -73,13 +73,17 @@ export async function transferToExternalAccount(req: RequestWithUser, res: Respo
     const txRef = randomString(32);
 
     const fee = Math.round(FEES(amount))
-    const amountWithoutFee = amount - fee;
+    const amountWithFee = amount + fee;
+
+    const accountBalance = await (await blochq.getCustomerAccount(wallet.accountId)).unwrap();
+
+    if (accountBalance.data.balance < amountWithFee) return errorHandler(res, "Your account balance is not enough", 403);
 
     const melonOrgAccount = await ACCOUNT_DETAILS();
 
     console.log(melonOrgAccount)
 
-    const transfer = await (await blochq.transferFromFixedAccount(amountWithoutFee, wallet.accountId, {bankCode: bank_code, accountNumber: account_number}, {narration, reference: txRef})).unwrap()
+    const transfer = await (await blochq.transferFromFixedAccount(amount, wallet.accountId, {bankCode: bank_code, accountNumber: account_number}, {narration, reference: txRef})).unwrap()
     const transferToOrgAccount = await (await blochq.transferFromFixedAccount(fee, wallet.accountId, {
       bankCode: melonOrgAccount.bankCode,
       accountNumber: melonOrgAccount.accountNumber
@@ -94,12 +98,13 @@ export async function transferToExternalAccount(req: RequestWithUser, res: Respo
 
   } catch (e: any) {
     console.error(e)
-    return errorHandler(res, e)
+    return errorHandler(res, e.message || "Unable to perform action, please try again")
   }
 }
 
 export function calculateFees(req: Request, res: Response) {
   const {amount} = req.body;
+  console.log(amount)
 
   if (amount == undefined) return errorHandler(res, "");
 
@@ -113,7 +118,7 @@ export async function getBanksList(_: RequestWithUser, res: Response) {
     successHandler(res, "Banks fetched", {banks: banks.data})
   } catch (e: any) {
     console.error(e)
-    return errorHandler(res, e)
+    return errorHandler(res, e.message || "Unable to perform action, please try again")
   }
 }
 
@@ -123,9 +128,11 @@ export async function resolveAccount(req: RequestWithUser, res: Response) {
 
     const account = await (await blochq.resolveAccount(accountNumber, bankCode)).unwrap();
 
+    console.log(account)
+
     successHandler(res, "Account resolved", {account: account.data})
   } catch (e: any) {
     console.error(e)
-    errorHandler(res, e)
+    errorHandler(res, e.message || "Unable to perform action, please try again")
   }
 }

@@ -14,5 +14,5 @@ export default function load(app: Router) {
     app.get("/misc/banks", authMiddleware as any, getBanksList as any)
     app.post("/misc/resolve-account", authMiddleware as any, resolveAccount as any)
 
-    app.get("/wallet/fees", calculateFees)
+    app.post("/wallet/fees", calculateFees)
 }
