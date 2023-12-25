@@ -1,8 +1,8 @@
 import { type User } from "../../models/User";
 import { RequestWithUser } from "../api";
 import { Result } from "../types";
-import { BlocResponse, AccountCreated, WalletCreated, FixedAccountCreated, BlocErrorResponse, TransferSuccessful, ExternalAccount, KYCT1Upgrade } from "./types";
-import { makeBlocPostRequest, makeBlocGetRequest } from "./util";
+import { BlocResponse, AccountCreated, WalletCreated, FixedAccountCreated, BlocErrorResponse, TransferSuccessful, ExternalAccount, KYCT1Upgrade, Transaction } from "./types";
+import { makeBlocPostRequest, makeBlocGetRequest, makeBlocDeleteRequest } from "./util";
 
 
 
@@ -51,6 +51,14 @@ export async function createFixedAccount(user: User, customerId: string): Promis
   }
 
   return Result.ok(await res.json() as BlocResponse<FixedAccountCreated>);
+}
+
+export async function getAccountTransactions(accountId: string): Promise<Result<BlocResponse<Transaction[]>, BlocErrorResponse<{}>>> {
+  const res = await makeBlocGetRequest("/transactions?account_id=" + accountId);
+
+  if (!res.ok) return Result.err(await res.json() as BlocErrorResponse<{}>)
+
+  return Result.ok(await res.json() as BlocResponse<Transaction[]>)
 }
 
 export async function getCustomerAccount(id: string): Promise<Result<BlocResponse<FixedAccountCreated>, BlocErrorResponse<{}>>> {
@@ -110,4 +118,29 @@ export async function resolveAccount(accountNumber: string, bankCode: string): P
   }
 
   return Result.ok(await res.json() as BlocResponse<ExternalAccount>)
+}
+
+
+export async function deleteCustomer(customerId: string): Promise<Result<BlocResponse<any>, BlocErrorResponse<any>>> {
+  const res = await makeBlocDeleteRequest("/customer/" + customerId);
+  const text = await res.text()
+
+  console.log(text)
+
+  if (!res.ok) return Result.err(JSON.parse(text) as BlocErrorResponse<any>);
+
+  return Result.ok(JSON.parse(text) as BlocResponse<{}>)
+}
+
+export async function deleteFixedAccount(accountId: string, closureReason: string): Promise<Result<BlocResponse<any>, BlocErrorResponse<any>>> {
+  const res = await makeBlocPostRequest("/accounts/" + accountId + "/close", {
+    reason: closureReason
+  });
+  const text = await res.text() || "{}";
+
+  console.log(text)
+
+  if (!res.ok) return Result.err(JSON.parse(text) as BlocErrorResponse<{}>);
+
+  return Result.ok(JSON.parse(text) as BlocResponse<{}>)
 }

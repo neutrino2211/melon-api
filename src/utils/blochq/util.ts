@@ -46,6 +46,15 @@ export async function makeBlocGetRequest(path: string) {
   })
 }
 
+export async function makeBlocDeleteRequest(path: string) {
+  return fetch(API_URL + path, {
+    method: "DELETE",
+    headers: {
+      'Authorization': 'Basic ' + PRIVATE_KEY
+    },
+  })
+}
+
 export async function getBanks(): Promise<Result<BlocResponse<BankDetails[]>, BlocErrorResponse<{}>>> {
   const res = await makeBlocGetRequest("/banks");
 

@@ -16,6 +16,7 @@ export class Result<T, E extends Error> {
 
   public unwrap(): T | PromiseLike<T> {
     if (this.isErr()) {
+      console.error("unwrap error:", this.errorValue)
       throw this.errorValue;
     }
 

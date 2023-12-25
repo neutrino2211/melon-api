@@ -3,6 +3,7 @@ export interface BlocResponse<T> {
   success: boolean
   data: T
   message: string
+  metadata?: Metadata
 }
 
 export interface WalletCreated {
@@ -13,6 +14,58 @@ export interface WalletCreated {
   bank_name: string
   balance: number
   customer: Customer
+}
+
+export interface Transaction {
+  id: string
+  created_at: string
+  updated_at: string
+  amount: number
+  reference: string
+  status: string
+  shared: boolean
+  currency: string
+  environment: string
+  payment_method: string
+  provider: string
+  payment_type: string
+  source: string
+  meta_data: TransactionMetaData
+  organization_id: string
+  customer_id: string
+  fee: number
+  billing_id: string
+  customer_detail: CustomerDetail
+  reversal: boolean
+  reversed_transaction_id: string
+  current_account_balance: number
+  account_id: string
+  card_id: string
+  drcr: string
+  operator_id: string
+  operator_detail: OperatorDetail
+}
+
+export interface TransactionMetaData {
+  sender_account_name: string
+  sender_bank_name: string
+}
+
+export interface CustomerDetail {
+  full_name: string
+  phone_number: string
+  email: string
+  country: string
+}
+
+export interface OperatorDetail {
+  full_name: string
+  phone_number: string
+}
+
+export interface Metadata {
+  has_next: boolean
+  has_previous: boolean
 }
 
 export interface NewTransactionWebhook {

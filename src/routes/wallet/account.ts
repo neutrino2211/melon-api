@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
-import { RequestWithUser, errorHandler, successHandler } from "../../utils/api";
+import { RequestWithUser, UNHANDLED_ERROR, errorHandler, successHandler } from "../../utils/api";
 import { userRepository, walletRepository } from "../../utils/data-source";
 import { AccountProviders, Wallet } from "../../models/Wallet";
 import { Maybe } from "../../utils/types";
 import * as blochq from "../../utils/blochq"
 import { ACCOUNT_DETAILS, FEES, getBanks } from "../../utils/blochq/util";
 import { randomString } from "../../utils/crypto";
+import { AccountCreated, BlocResponse } from "../../utils/blochq/types";
 
 export async function getAccountDetails(req: RequestWithUser, res: Response) {
 
@@ -20,6 +21,12 @@ export async function getAccountDetails(req: RequestWithUser, res: Response) {
   }
 
   const walletAccount = await (await blochq.getCustomerAccount(wallet.accountId)).unwrap();
+
+  if (wallet.accountName == "") wallet.accountName = walletAccount.data.name;
+  if (wallet.accountNumber == "") wallet.accountNumber = walletAccount.data.account_number;
+  if (wallet.bankName == "") wallet.bankName = walletAccount.data.bank_name;
+
+  await walletRepository.update({user: req.user.id}, wallet);
 
   console.log(walletAccount.data)
 
@@ -42,9 +49,16 @@ export async function createWallet(req: RequestWithUser, res: Response) {
 
     const user = new Maybe(await userRepository.findOne({where: {id: wallet.user}})).unwrap();
 
-    const customerAccount = await (await blochq.createCustomer(user)).unwrap()
+    let customerAccount: BlocResponse<AccountCreated> | undefined = undefined;
+    const customerAccountRes = await blochq.createCustomer(user)
 
-    const customerFixedAccount = await (await blochq.createFixedAccount(user, customerAccount.data.id)).unwrap();
+    if (customerAccountRes.isOk()) {
+      customerAccount = await customerAccountRes.unwrap();
+    } else {
+      customerAccount = await (await blochq.getCustomerAccount(wallet.accountId)).unwrap() as any as BlocResponse<AccountCreated>
+    }
+
+    const customerFixedAccount = await (await blochq.createFixedAccount(user, customerAccount!!.data.id)).unwrap();
 
     console.log(customerFixedAccount);
 
@@ -57,6 +71,54 @@ export async function createWallet(req: RequestWithUser, res: Response) {
   } catch (e: any) {
     console.error(e)
     return errorHandler(res, e.message || "Unable to perform action, please try again")
+  }
+}
+
+export async function getTransactions(req: RequestWithUser, res: Response) {
+  try {
+    let wallet = await walletRepository.findOne({where: {user: req.user.id}})
+
+    if (wallet == null) {
+      return errorHandler(res, "You don't have a wallet yet", 404)
+    }
+
+    console.log(wallet)
+    const txs = await (await blochq.getAccountTransactions(wallet.accountId)).unwrap();
+
+    console.log(txs)
+
+    const sortedTxs = txs.data.sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
+
+    successHandler(res, "fetched all transactions successfully", sortedTxs)
+  } catch(e: any) {
+    console.error(e)
+    errorHandler(res, UNHANDLED_ERROR(e))
+  }
+}
+
+export async function deleteAccount(req: RequestWithUser, res: Response) {
+  try {
+    let wallet = await walletRepository.findOne({where: {user: req.user.id}})
+
+    if (wallet == null) {
+      return errorHandler(res, "You don't have a wallet yet", 404)
+    }
+    const customerAccount = await (await blochq.getCustomerAccount(wallet.accountId)).unwrap();
+
+    console.log(customerAccount)
+
+    const closure = await (await blochq.deleteFixedAccount(customerAccount.data.id, "Customer requested closure")).unwrap();
+
+    await walletRepository.update({user: req.user.id}, {accountId: undefined})
+
+    console.log(closure)
+
+    wallet.accountId = "";
+
+    successHandler(res, "User wallet deleted successfully", wallet);
+  } catch (e: any) {
+    console.error(e)
+    return errorHandler(res, UNHANDLED_ERROR(e))
   }
 }
 
