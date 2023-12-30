@@ -95,6 +95,23 @@ export interface NewTransactionWebhook {
   drcr: string
 }
 
+export interface BillProvider {
+  desc: string
+  id: string
+  name: string
+  sector: string
+}
+
+export interface BillProviderProduct {
+  category: string
+  desc: any
+  fee_type: string
+  id: string
+  meta: any
+  name: string
+  operator: string
+}
+
 export interface CustomerDetail {
   full_name: string
   phone_number: string

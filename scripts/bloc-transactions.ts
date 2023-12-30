@@ -6,7 +6,7 @@ const options = {
   }
 };
 
-fetch('https://api.blochq.io/v1/transactions?customer_id=6578635a78dc50f2952673ff', options)
+fetch('https://api.blochq.io/v1/transactions?account_id=6578635b78dc50f295267401', options)
   .then(response => response.json())
   .then((response: any) => console.log(response?.data!!))
   .catch(err => console.error(err));

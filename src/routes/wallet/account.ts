@@ -9,28 +9,36 @@ import { randomString } from "../../utils/crypto";
 import { AccountCreated, BlocResponse } from "../../utils/blochq/types";
 
 export async function getAccountDetails(req: RequestWithUser, res: Response) {
+  try {
+    let wallet = await walletRepository.findOne({where: {user: req.user.id}})
 
-  let wallet = await walletRepository.findOne({where: {user: req.user.id}})
+    if (wallet == null) {
+      return errorHandler(res, "You don't have a wallet yet", 404)
+    }
 
-  if (wallet == null) {
-    return errorHandler(res, "You don't have a wallet yet", 404)
+    if (wallet.accountId == null || wallet.accountId == "") {
+      return errorHandler(res, "You have no bank account yet", 404)
+    }
+
+    const walletAccount = await (await blochq.getCustomerAccount(wallet.accountId)).unwrap();
+
+    if (wallet.accountName == "" || wallet.accountNumber == "" || wallet.bankName == "") {
+      await walletRepository.update({user: req.user.id}, {
+        bankName: walletAccount.data.bank_name,
+        accountName: walletAccount.data.name,
+        accountNumber: walletAccount.data.account_number
+      });
+    }
+
+    if (wallet.balance != walletAccount.data.balance) await walletRepository.update({user: req.user.id}, {balance: walletAccount.data.balance});
+
+    console.log(walletAccount.data)
+
+    successHandler(res, "Wallet bank account fetched", walletAccount.data);
+  } catch (e: any) {
+    console.error(e)
+    errorHandler(res, UNHANDLED_ERROR(e))
   }
-
-  if (wallet.accountId == null || wallet.accountId == "") {
-    return errorHandler(res, "You have no bank account yet", 404)
-  }
-
-  const walletAccount = await (await blochq.getCustomerAccount(wallet.accountId)).unwrap();
-
-  if (wallet.accountName == "") wallet.accountName = walletAccount.data.name;
-  if (wallet.accountNumber == "") wallet.accountNumber = walletAccount.data.account_number;
-  if (wallet.bankName == "") wallet.bankName = walletAccount.data.bank_name;
-
-  await walletRepository.update({user: req.user.id}, wallet);
-
-  console.log(walletAccount.data)
-
-  successHandler(res, "Wallet bank account fetched", walletAccount.data);
 }
 
 export async function createWallet(req: RequestWithUser, res: Response) {
@@ -87,7 +95,7 @@ export async function getTransactions(req: RequestWithUser, res: Response) {
 
     console.log(txs)
 
-    const sortedTxs = txs.data.sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
+    const sortedTxs = (txs.data || []).sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
 
     successHandler(res, "fetched all transactions successfully", sortedTxs)
   } catch(e: any) {

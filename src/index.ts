@@ -8,6 +8,7 @@ import bodyParser from "body-parser";
 
 import auth from "./routes/auth";
 import user from "./routes/user";
+import bills from "./routes/bills";
 import wallet from "./routes/wallet";
 import webhooks from "./routes/webhooks";
 import { MelonDataSource } from "./utils/data-source";
@@ -20,6 +21,7 @@ app.use(bodyParser.json())
 MelonDataSource.initialize().then(() => {
     auth(app);
     user(app);
+    bills(app);
     wallet(app);
     webhooks(app)
 

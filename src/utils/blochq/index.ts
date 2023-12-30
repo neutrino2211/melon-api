@@ -1,8 +1,8 @@
 import { type User } from "../../models/User";
 import { RequestWithUser } from "../api";
 import { Result } from "../types";
-import { BlocResponse, AccountCreated, WalletCreated, FixedAccountCreated, BlocErrorResponse, TransferSuccessful, ExternalAccount, KYCT1Upgrade, Transaction } from "./types";
-import { makeBlocPostRequest, makeBlocGetRequest, makeBlocDeleteRequest } from "./util";
+import { BlocResponse, AccountCreated, WalletCreated, FixedAccountCreated, BlocErrorResponse, TransferSuccessful, ExternalAccount, KYCT1Upgrade, Transaction, BillProvider, BillProviderProduct } from "./types";
+import { makeBlocPostRequest, makeBlocGetRequest, makeBlocDeleteRequest, BillPaymentProviders } from "./util";
 
 
 
@@ -143,4 +143,26 @@ export async function deleteFixedAccount(accountId: string, closureReason: strin
   if (!res.ok) return Result.err(JSON.parse(text) as BlocErrorResponse<{}>);
 
   return Result.ok(JSON.parse(text) as BlocResponse<{}>)
+}
+
+export async function getSupportedOperators(provider: BillPaymentProviders): Promise<Result<BlocResponse<BillProvider[]>, BlocErrorResponse<{}>>> {
+  const res = await makeBlocGetRequest("/bills/operators?bill=" + provider);
+
+  if (!res.ok) return Result.err(await res.json() as BlocErrorResponse<{}>);
+
+  return Result.ok(await res.json() as BlocResponse<BillProvider[]>);
+}
+
+export async function getOperatorProducts(provider: BillPaymentProviders, operator: string): Promise<Result<BlocResponse<BillProviderProduct[]>, BlocErrorResponse<{}>>> {
+  const res = await makeBlocGetRequest("/bills/operators/" + operator + "/products?bill=" + provider);
+
+  if (!res.ok) return Result.err(await res.json() as BlocErrorResponse<{}>);
+
+  return Result.ok(await res.json() as BlocResponse<BillProviderProduct[]>);
+}
+
+export async function validateDevice(provider: BillPaymentProviders, operator: string, deviceNumber: string): Promise<boolean> {
+  const res = await makeBlocGetRequest("/bills/customer/validate/" + operator + "?meter_type=prepaid&bill=" + provider + "&device_number=" + deviceNumber);
+
+  return res.ok;
 }

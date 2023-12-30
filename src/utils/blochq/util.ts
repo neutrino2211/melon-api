@@ -8,6 +8,12 @@ const API_URL = 'https://api.blochq.io/v1';
 
 console.log(PRIVATE_KEY)
 
+export enum BillPaymentProviders {
+  electricity = "electricity",
+  television = "television",
+  telco = "telco"
+}
+
 export const ACCOUNT_DETAILS = async () => {
   return {
     bank: "Sterling",
