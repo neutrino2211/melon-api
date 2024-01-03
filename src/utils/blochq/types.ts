@@ -95,6 +95,23 @@ export interface NewTransactionWebhook {
   drcr: string
 }
 
+export interface BillPayment {
+  created_at: string
+  status: string
+  amount: number
+  reference: string
+  customer_name: string
+  operator_id: string
+  product_id: string
+  bill_type: string
+  meta_data: BillPaymentMetaData
+}
+
+export interface BillPaymentMetaData {
+  operator_name: string
+  token: string
+}
+
 export interface BillProvider {
   desc: string
   id: string

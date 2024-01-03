@@ -1,7 +1,7 @@
 import { type User } from "../../models/User";
 import { RequestWithUser } from "../api";
 import { Result } from "../types";
-import { BlocResponse, AccountCreated, WalletCreated, FixedAccountCreated, BlocErrorResponse, TransferSuccessful, ExternalAccount, KYCT1Upgrade, Transaction, BillProvider, BillProviderProduct } from "./types";
+import { BlocResponse, AccountCreated, WalletCreated, FixedAccountCreated, BlocErrorResponse, TransferSuccessful, ExternalAccount, KYCT1Upgrade, Transaction, BillProvider, BillProviderProduct, BillPayment } from "./types";
 import { makeBlocPostRequest, makeBlocGetRequest, makeBlocDeleteRequest, BillPaymentProviders } from "./util";
 
 
@@ -159,6 +159,35 @@ export async function getOperatorProducts(provider: BillPaymentProviders, operat
   if (!res.ok) return Result.err(await res.json() as BlocErrorResponse<{}>);
 
   return Result.ok(await res.json() as BlocResponse<BillProviderProduct[]>);
+}
+
+export async function payBill(provider: BillPaymentProviders, operator: string, accountId: string, productId: string, deviceNumber: string, amount: number): Promise<Result<BlocResponse<BillPayment>, BlocErrorResponse<{}>>> {
+  const providerObjects: {[key: string]: any} = {
+    [BillPaymentProviders.electricity]: {
+      device_number: deviceNumber,
+      meter_type: "prepaid"
+    },
+
+    [BillPaymentProviders.telco]: {
+      beneficiary_msisdn: deviceNumber
+    }, 
+
+    [BillPaymentProviders.television]: {
+      device_number: deviceNumber,
+    }
+  }
+  
+  const res = await makeBlocPostRequest("/bills/payment?bill=" + provider, {
+    amount,
+    product_id: productId,
+    account_id: accountId,
+    operator_id: operator,
+    device_details: providerObjects[provider]
+  });
+
+  if (!res.ok) return Result.err(await res.json() as BlocErrorResponse<{}>)
+
+  return Result.ok(await res.json() as BlocResponse<BillPayment>)
 }
 
 export async function validateDevice(provider: BillPaymentProviders, operator: string, deviceNumber: string): Promise<boolean> {
